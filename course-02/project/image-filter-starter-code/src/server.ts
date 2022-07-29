@@ -38,7 +38,6 @@ const validUrl = require('valid-url');
     
     if (image_url && validUrl.isUri(image_url)) {
       let filtered_url = await filterImageFromURL(image_url);
-      console.log(filtered_url);
       res.status(200).sendFile(filtered_url,function () {
           try {
             deleteLocalFiles([filtered_url])  
