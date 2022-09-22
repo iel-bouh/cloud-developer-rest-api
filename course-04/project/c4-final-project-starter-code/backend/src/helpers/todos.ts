@@ -8,3 +8,8 @@ import * as uuid from 'uuid'
 import * as createError from 'http-errors'
 
 // TODO: Implement businessLogic
+const todosAcess = new TodosAccess()
+
+export async function getTodosForUser(){
+  return todosAcess.getTodosForUser()
+}
