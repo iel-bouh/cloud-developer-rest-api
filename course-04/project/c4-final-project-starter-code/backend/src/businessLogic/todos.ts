@@ -14,6 +14,9 @@ export async function getTodosForUser(userId){
   return todosAcess.getTodosForUser(userId)
 }
 
+export async function deleteTodo(todoId,userId){
+  return todosAcess.deleteTodo(todoId,userId)
+}
 export async function createTodo(
   CreateTodoRequest: CreateTodoRequest,
   userId:string
