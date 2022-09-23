@@ -2,7 +2,7 @@ import { TodosAccess } from '../helpers/todosAcess'
 // import { AttachmentUtils } from '../helpers/attachmentUtils';
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-// import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 // import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 // import * as createError from 'http-errors'
@@ -16,7 +16,6 @@ export async function getTodosForUser(userId){
 
 export async function createTodo(
   CreateTodoRequest: CreateTodoRequest,
-  jwtToken: string,
   userId:string
 ): Promise<TodoItem> {
 
@@ -31,4 +30,18 @@ export async function createTodo(
     createdAt: CreateTodoRequest.createdAt,
     attachmentUrl: CreateTodoRequest.attachmentUrl,
   })
+}
+
+export async function updateTodo(
+  UpdateTodoRequest: UpdateTodoRequest,
+  todoId:string,
+  userId:string
+): Promise<UpdateTodoRequest> {
+
+
+  return await todosAcess.updateTodo({
+    name: UpdateTodoRequest.name,
+    dueDate:UpdateTodoRequest.dueDate,
+    done: UpdateTodoRequest.done,
+  },todoId,userId)
 }

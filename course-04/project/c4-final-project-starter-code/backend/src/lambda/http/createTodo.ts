@@ -14,7 +14,7 @@ export const handler = middy(
     const split = authorization.split(' ')
     const jwtToken = split[1]
   
-    const newItem = await createTodo(newTodo, jwtToken, getUserId(event))
+    const newItem = await createTodo(newTodo, getUserId(event))
   
     return {
       statusCode: 201,

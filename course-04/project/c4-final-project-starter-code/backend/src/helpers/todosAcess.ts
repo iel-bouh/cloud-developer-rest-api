@@ -3,7 +3,7 @@ import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
-// import { TodoUpdate } from '../models/TodoUpdate';
+import { TodoUpdate } from '../models/TodoUpdate';
 
 // const XAWS = AWSXRay.captureAWS(AWS)
 
@@ -44,8 +44,23 @@ export class TodosAccess {
 
     return item
   }
-}
 
+
+  async updateTodo(item: TodoUpdate,todoId:string,userId:string): Promise<TodoUpdate> {
+    await this.docClient.update({
+      TableName: this.todosTable,
+      UpdateExpression:"set name = :name ,dueDate = :dueDate, done = :done",
+      ExpressionAttributeValues: item,
+      Key: {
+        todoId,
+        userId,
+      },
+
+    }).promise()
+
+    return item
+  }
+}
 // function createDynamoDBClient() {
 //   if (process.env.IS_OFFLINE) {
 //     console.log('Creating a local DynamoDB instance')
