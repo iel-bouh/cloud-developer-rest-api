@@ -3,11 +3,11 @@ import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
-import { TodoUpdate } from '../models/TodoUpdate';
+// import { TodoUpdate } from '../models/TodoUpdate';
 
-const XAWS = AWSXRay.captureAWS(AWS)
+// const XAWS = AWSXRay.captureAWS(AWS)
 
-const logger = createLogger('TodosAccess')
+// const logger = createLogger('TodosAccess')
 
 // TODO: Implement the dataLayer logic
 
@@ -15,30 +15,36 @@ export class TodosAccess {
 
   constructor(
     private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'}),
-    private readonly todosTable = process.env.TODOS_TABLE) {
+    private readonly todosTable = process.env.TODOS_TABLE
+    
+    ) {
   }
 
   async getTodosForUser(userId){
     console.log('Getting all Items')
 
-    const result = await this.docClient.scan({
+    const result = await this.docClient.get({
+      
+
       TableName: this.todosTable,
-      id: userId
+      Key: {
+        'userId': userId
+      }
     }).promise()
 
-    const items = result.Items
-    return items
+    const item = result.Item
+    return item
   }
 
-//   async createGroup(group: Group): Promise<Group> {
-//     await this.docClient.put({
-//       TableName: this.groupsTable,
-//       Item: group
-//     }).promise()
+  async createTodo(item: TodoItem): Promise<TodoItem> {
+    await this.docClient.put({
+      TableName: this.todosTable,
+      Item: item
+    }).promise()
 
-//     return group
-//   }
-// }
+    return item
+  }
+}
 
 // function createDynamoDBClient() {
 //   if (process.env.IS_OFFLINE) {
@@ -50,4 +56,4 @@ export class TodosAccess {
 //   }
 
 //   return new XAWS.DynamoDB.DocumentClient()
-}
+// }

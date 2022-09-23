@@ -10,8 +10,20 @@ export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body)
     // TODO: Implement creating a new TODO item
-
-    return undefined
+    const authorization = event.headers.Authorization
+    const split = authorization.split(' ')
+    const jwtToken = split[1]
+  
+    const newItem = await createTodo(newTodo, jwtToken, getUserId(event))
+  
+    return {
+      statusCode: 201,
+      body: JSON.stringify({
+        newItem
+      })
+    }
+    
+  }
 )
 
 handler.use(
