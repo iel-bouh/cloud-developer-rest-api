@@ -13,15 +13,13 @@ const logger = createLogger('TodosAccess')
 
 export class TodosAccess {
   constructor(
-    private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(
-      { apiVersion: '2012-08-10' }
-    ),
+    private readonly docClient: DocumentClient = createDynamoDBClient(),
     private readonly todosTable = process.env.TODOS_TABLE,
     private readonly indexTable = process.env.TODOS_CREATED_AT_INDEX
   ) {}
 
   async getTodosForUser(userId) {
-    console.log('Getting all Items')
+    logger.info('getting all todos', userId)
 
     const result = await this.docClient
       .query({
@@ -39,6 +37,8 @@ export class TodosAccess {
   }
 
   async createTodo(item: TodoItem): Promise<TodoItem> {
+    logger.info('create todo', item)
+
     await this.docClient
       .put({
         TableName: this.todosTable,
@@ -54,6 +54,8 @@ export class TodosAccess {
     todoId: string,
     userId: string
   ): Promise<TodoUpdate> {
+    logger.info('update todo todo', todoId)
+
     await this.docClient
       .update({
         TableName: this.todosTable,
@@ -69,6 +71,8 @@ export class TodosAccess {
     return item
   }
   async deleteTodo(todoId, userId) {
+    logger.info('delete todo', todoId)
+
     await this.docClient
       .delete({
         TableName: this.todosTable,
