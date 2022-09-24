@@ -1,5 +1,5 @@
 import { TodosAccess } from '../helpers/todosAcess'
-// import { AttachmentUtils } from '../helpers/attachmentUtils';
+import * as AttachmentUtils from '../helpers/attachmentUtils'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
@@ -10,41 +10,66 @@ import * as uuid from 'uuid'
 // TODO: Implement businessLogic
 const todosAcess = new TodosAccess()
 
-export async function getTodosForUser(userId){
+export async function getTodosForUser(userId) {
   return todosAcess.getTodosForUser(userId)
 }
 
-export async function deleteTodo(todoId,userId){
-  return todosAcess.deleteTodo(todoId,userId)
+export async function deleteTodo(todoId, userId) {
+  return todosAcess.deleteTodo(todoId, userId)
 }
 export async function createTodo(
   CreateTodoRequest: CreateTodoRequest,
-  userId:string
+  userId: string
 ): Promise<TodoItem> {
-
   const todoId = uuid.v4()
 
   return await todosAcess.createTodo({
     userId,
     todoId,
     name: CreateTodoRequest.name,
-    dueDate:CreateTodoRequest.dueDate,
+    dueDate: CreateTodoRequest.dueDate,
     done: CreateTodoRequest.done,
     createdAt: CreateTodoRequest.createdAt,
-    attachmentUrl: CreateTodoRequest.attachmentUrl,
+    attachmentUrl: CreateTodoRequest.attachmentUrl
   })
 }
 
 export async function updateTodo(
   UpdateTodoRequest: UpdateTodoRequest,
-  todoId:string,
-  userId:string
+  todoId: string,
+  userId: string
 ): Promise<UpdateTodoRequest> {
+  return await todosAcess.updateTodo(
+    {
+      name: UpdateTodoRequest.name,
+      dueDate: UpdateTodoRequest.dueDate,
+      done: UpdateTodoRequest.done
+    },
+    todoId,
+    userId
+  )
+}
 
+export async function createAttachmentPresignedUrl(todoId, userId, event) {
+  const validTodoId = await AttachmentUtils.todoIdExist(todoId)
 
-  return await todosAcess.updateTodo({
-    name: UpdateTodoRequest.name,
-    dueDate:UpdateTodoRequest.dueDate,
-    done: UpdateTodoRequest.done,
-  },todoId,userId)
+  if (!validTodoId) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({
+        error: 'todo does not exist'
+      })
+    }
+  }
+
+  const newItem = await AttachmentUtils.createImage(todoId, userId)
+
+  const url = AttachmentUtils.getUploadUrl(todoId)
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      uploadUrl: url
+    })
+  }
 }

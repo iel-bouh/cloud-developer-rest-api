@@ -122,7 +122,13 @@ functions:
       - http:
           method: post
           path: todos/{todoId}/attachment
-
+          cors: true
+          authorizer: Auth
+     iiamRoleStatements:
+    - Effect: "Allow"
+      Action:
+       - "s3:*"
+      Resource: { "Fn::Join": ["", ["arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}", "/*" ] ] }
 resources:
   Resources:
     # Add necessary AWS resources. You will need at least the following AWS resources
