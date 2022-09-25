@@ -3,15 +3,13 @@ import * as AttachmentUtils from '../helpers/attachmentUtils'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-// import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
-// import * as createError from 'http-errors'
 
 // TODO: Implement businessLogic
 const todosAcess = new TodosAccess()
 
 export async function getTodosForUser(userId) {
-  return todosAcess.getTodosForUser(userId)
+  return await todosAcess.getTodosForUser(userId)
 }
 
 export async function deleteTodo(todoId, userId) {
@@ -26,11 +24,8 @@ export async function createTodo(
   return await todosAcess.createTodo({
     userId,
     todoId,
-    name: CreateTodoRequest.name,
-    dueDate: CreateTodoRequest.dueDate,
-    done: CreateTodoRequest.done,
-    createdAt: CreateTodoRequest.createdAt,
-    attachmentUrl: CreateTodoRequest.attachmentUrl
+    createdAt: new Date().toLocaleString(),
+    ...CreateTodoRequest
   })
 }
 
@@ -39,19 +34,11 @@ export async function updateTodo(
   todoId: string,
   userId: string
 ): Promise<UpdateTodoRequest> {
-  return await todosAcess.updateTodo(
-    {
-      name: UpdateTodoRequest.name,
-      dueDate: UpdateTodoRequest.dueDate,
-      done: UpdateTodoRequest.done
-    },
-    todoId,
-    userId
-  )
+  return await todosAcess.updateTodo(UpdateTodoRequest, todoId, userId)
 }
 
-export async function createAttachmentPresignedUrl(todoId, userId, event) {
-  const validTodoId = await AttachmentUtils.todoIdExist(todoId)
+export async function createAttachmentPresignedUrl(todoId, userId) {
+  const validTodoId = await AttachmentUtils.todoIdExist(todoId, userId)
 
   if (!validTodoId) {
     return {
@@ -62,14 +49,9 @@ export async function createAttachmentPresignedUrl(todoId, userId, event) {
     }
   }
 
-  const newItem = await AttachmentUtils.createImage(todoId, userId)
+  await AttachmentUtils.createImage(todoId, userId)
 
   const url = AttachmentUtils.getUploadUrl(todoId)
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      uploadUrl: url
-    })
-  }
+  return url
 }

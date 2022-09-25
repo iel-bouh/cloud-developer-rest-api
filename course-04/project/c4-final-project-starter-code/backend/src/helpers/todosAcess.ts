@@ -28,12 +28,13 @@ export class TodosAccess {
         KeyConditionExpression: 'userId = :userId',
         ExpressionAttributeValues: {
           ':userId': userId
-        }
+        },
+        FilterExpression: ':userId = :userId'
       })
       .promise()
 
     const item = result.Items
-    return item
+    return item as TodoItem[]
   }
 
   async createTodo(item: TodoItem): Promise<TodoItem> {
@@ -59,8 +60,10 @@ export class TodosAccess {
     await this.docClient
       .update({
         TableName: this.todosTable,
-        UpdateExpression: 'set name = :name ,dueDate = :dueDate, done = :done',
-        ExpressionAttributeValues: item,
+        UpdateExpression: 'set done = :done',
+        ExpressionAttributeValues: {
+          ':done': item['done']
+        },
         Key: {
           todoId,
           userId
@@ -77,12 +80,8 @@ export class TodosAccess {
       .delete({
         TableName: this.todosTable,
         Key: {
-          userId: {
-            S: userId
-          },
-          todoId: {
-            S: todoId
-          }
+          userId,
+          todoId
         }
       })
       .promise()

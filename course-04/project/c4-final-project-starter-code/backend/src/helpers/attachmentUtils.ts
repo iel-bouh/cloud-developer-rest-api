@@ -18,9 +18,11 @@ export async function createImage(todoId: string, userId: string) {
 
   await docClient
     .update({
-      TableName: this.todosTable,
+      TableName: process.env.TODOS_TABLE,
       UpdateExpression: 'set attachmentUrl = :attachmentUrl',
-      ExpressionAttributeValues: item,
+      ExpressionAttributeValues: {
+        ':attachmentUrl': item['attachmentUrl']
+      },
       Key: {
         todoId,
         userId
@@ -31,12 +33,13 @@ export async function createImage(todoId: string, userId: string) {
   return item
 }
 
-export async function todoIdExist(todoId: string) {
+export async function todoIdExist(todoId: string, userId: string) {
   const result = await docClient
     .get({
       TableName: process.env.TODOS_TABLE,
       Key: {
-        todoId
+        todoId,
+        userId
       }
     })
     .promise()

@@ -3,10 +3,9 @@ import 'source-map-support/register'
 
 import { verify, decode } from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
-// import Axios from 'axios'
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
-import {JwksClient} from 'jwks-rsa'
+import { JwksClient } from 'jwks-rsa'
 const util = require('util')
 const logger = createLogger('auth')
 
@@ -87,6 +86,6 @@ function getToken(authHeader: string): string {
 const client = new JwksClient({
   cache: true,
   rateLimit: true,
-  jwksRequestsPerMinute: 10, // Default value
+  jwksRequestsPerMinute: 10,
   jwksUri: jwksUrl
 })

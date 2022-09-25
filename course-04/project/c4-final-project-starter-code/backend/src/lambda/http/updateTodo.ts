@@ -13,21 +13,17 @@ export const handler = middy(
     const todoId = event.pathParameters.todoId
     const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
     // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
-    const item  = updateTodo(updatedTodo,todoId,getUserId(event));
+    const item = await updateTodo(updatedTodo, todoId, getUserId(event))
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        
-      })
+      body: JSON.stringify(item)
     }
   }
 )
 
-handler
-  .use(httpErrorHandler())
-  .use(
-    cors({
-      credentials: true
-    })
-  )
+handler.use(httpErrorHandler()).use(
+  cors({
+    credentials: true
+  })
+)
